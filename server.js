@@ -52,9 +52,9 @@ app.post('/messages', async (req, res) => {
     } catch (error) {
         res.sendStatus(500)
         return console.error(error)
-    } //finally {
-        //console.log('message post called')
-    //}
+    } finally {
+        console.log('message post called')
+    }
 })
 app.post('/messages', async (req, res) => {
 
