@@ -11,6 +11,11 @@ app.use(bodyParser.urlencoded({extended: false}))
 
 var dbUrl = 'mongodb://user:1234@ds255265.mlab.com:55265/learning-node1130'
 
+var Message = mongoose.model('Message',{
+    name: String,
+    message: String
+})
+
 var messages = [
     {name: 'Tim', message: 'Hi'},
     {name: 'Jane', message: 'Hello'}
@@ -18,13 +23,22 @@ var messages = [
 ]
 
 app.get('/messages', (req, res) =>{
-    res.send(messages)
+   Message.find({}, (err,messages)=>{
+         res.send(messages) 
+   })
 })
 
 app.post('/messages', (req, res) =>{
-    messages.push(req.body)
-    io.emit('message',req.body)
-    res.sendStatus(200)
+    var message = new Message(req.body)
+
+    message.save((err) =>{
+        if(err)
+        sendStatus(500)
+
+        io.emit('message',req.body)
+        res.sendStatus(200)
+    })
+
 })
 
 io.on('Connection', (socket) =>{
