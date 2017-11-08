@@ -18,47 +18,93 @@ var Message = mongoose.model('Message',{
     message: String
 })
 
-var messages = [
-    {name: 'Tim', message: 'Hi'},
-    {name: 'Jane', message: 'Hello'}
-    
-]
-
-app.get('/messages', (req, res) =>{
-   Message.find({}, (err,messages)=>{
-         res.send(messages) 
-   })
+app.get('/messages', (req, res) => {
+    Message.find({}, (err, messages) => {
+        res.send(messages)
+    })
 })
 
-app.post('/messages', async (req, res) =>{
+app.get('/messages/:user', (req, res) => {
+    var user = req.params.user
+    Message.find({name: user}, (err, messages) => {
+        res.send(messages)
+    })
+})
 
-    try{
+
+app.post('/messages', async (req, res) => {
+
+    try {
         var message = new Message(req.body)
+
         var savedMessage = await message.save()
-        
+
         console.log('saved')
-        
-        var censored =  await Message.findOne({message: 'badword'})
-        
-        if(censored) 
-               await Message.remove({_id: censored.id})
+
+        var censored = await Message.findOne({ message: 'badword' })
+
+        if (censored)
+            await Message.remove({ _id: censored.id })
         else
-            io.emit('message',req.body)
-            
+            io.emit('message', req.body)
+
         res.sendStatus(200)
-    }catch(error){
+    } catch (error) {
         res.sendStatus(500)
         return console.error(error)
-    } finally{
+    } //finally {
+        //console.log('message post called')
+    //}
+})
+app.post('/messages', async (req, res) => {
+
+    try {
+        var message = new Message(req.body)
+
+        var savedMessage = await message.save()
+
+        console.log('saved')
+
+        var censored = await Message.findOne({ message: 'badword' })
+
+        if (censored)
+            await Message.remove({ _id: censored.id })
+        else
+            io.emit('message', req.body)
+
+        res.sendStatus(200)
+    } catch (error) {
+        res.sendStatus(500)
+        return console.error(error)
+    } finally {
         console.log('message post called')
     }
-
-    // .catch((err)=>{
-    //     res.sendStatus(500)
-    //     return console.error(err)
-    // })
-
 })
+app.post('/messages', async (req, res) => {
+    
+        try {
+            var message = new Message(req.body)
+    
+            var savedMessage = await message.save()
+    
+            console.log('saved')
+    
+            var censored = await Message.findOne({ message: 'badword' })
+    
+            if (censored)
+                await Message.remove({ _id: censored.id })
+            else
+                io.emit('message', req.body)
+    
+            res.sendStatus(200)
+        } catch (error) {
+            res.sendStatus(500)
+            return console.error(error)
+        } finally {
+            console.log('message post called')
+        }
+    })
+    
 
 
 io.on('Connection', (socket) =>{
